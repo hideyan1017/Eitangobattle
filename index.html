@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- メタタグ・ファビコン -->
+  <!-- メタタグ・ファビコン -->
   <link rel="icon" href="https://raw.githubusercontent.com/hideyan1017/Eitangobattle/refs/heads/main/%E8%8B%B1%E5%8D%98%E8%AA%9EDX.png">
   <meta property="og:type" content="article" />
   <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/hideyan1017/Eitangobattle/refs/heads/main/%E8%8B%B1%E5%8D%98%E8%AA%9EDX.png">
 
   <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/hideyan1017/Eitangobattle/refs/heads/main/%E8%8B%B1%E5%8D%98%E8%AA%9EDX.png">
   <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/hideyan1017/Eitangobattle/refs/heads/main/%E8%8B%B1%E5%8D%98%E8%AA%9EDX.png">
-   <meta property="og:title" content="英単語バトルタイピングDX" />
+  <meta property="og:title" content="英単語バトルタイピングDX" />
   <meta property="og:description" content="英単語力で勝負だ！" />
   <meta property="og:image" content="https://raw.githubusercontent.com/hideyan1017/Eitangobattle/refs/heads/main/%E8%8B%B1%E5%8D%98%E8%AA%9EDX%E3%83%AD%E3%82%B4.png" />
 
   <title>英単語バトルDX</title>
+  <!-- Google Web Fonts (Roboto Mono, Fira Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600;700&family=Roboto+Mono:wght@600;700&display=swap" rel="stylesheet">
+
   <!-- リアルタイム対戦用 PeerJS ライブラリ -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
@@ -26,6 +31,7 @@
       --accent-green: #16a34a;
       --accent-red: #dc2626;
       --border-color: #cbd5e1;
+      --english-font: monospace;
     }
 
     * {
@@ -266,7 +272,7 @@
       justify-content: center;
       font-size: 1.3rem;
       font-weight: 700;
-      font-family: monospace;
+      font-family: var(--english-font);
       color: #64748b;
     }
 
@@ -304,7 +310,7 @@
       border: 1px solid var(--border-color);
       border-radius: 8px;
       cursor: pointer;
-      font-family: monospace;
+      font-family: var(--english-font);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -465,6 +471,23 @@
       height: 1.6rem;
       object-fit: contain;
     }
+
+    /* フォントプレビュー用スタイル */
+    .font-preview-box {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+    .font-preview-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      font-family: var(--english-font);
+      letter-spacing: 2px;
+    }
   </style>
 </head>
 <body>
@@ -472,7 +495,7 @@
 <div class="container">
   <!-- ホーム選択画面 -->
   <div id="home-screen" class="screen active">
-    <h1>英単語バトルタイピングDX</h1>
+    <h1>早押しタイピング学習アプリ</h1>
     <p class="subtitle">製作者；<a href="https://x.com/syokuennsu1" style="color: #d2b48c;">食縁水</a></p>
     
     <div class="card">
@@ -481,10 +504,10 @@
     </div>
   </div>
 
-  <!-- サウンド設定画面 -->
+  <!-- サウンド・フォント設定画面 -->
   <div id="sound-settings-screen" class="screen">
-    <h1>音量・サウンド設定</h1>
-    <p class="subtitle">効果音のカスタマイズ</p>
+    <h1>設定画面</h1>
+    <p class="subtitle">効果音とフォントのカスタマイズ</p>
 
     <div class="card">
       <div class="form-group">
@@ -497,8 +520,20 @@
         <label class="checkbox-label"><input type="checkbox" id="snd-correct" checked> 正解音 (文字・単語)</label>
         <label class="checkbox-label"><input type="checkbox" id="snd-miss" checked> 不正解・タイムアップ音</label>
       </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>英語フォント設定</label>
+        <select id="font-select" onchange="changeEnglishFont(this.value)">
+          <option value="monospace">デフォルト</option>
+          <option value="'Roboto Mono', monospace">Roboto Mono
+          </option>
+          <option value="'Fira Code', monospace">Fira Code</option>
+        </select>
+        <div class="font-preview-box">
+          <span style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">サンプルプレビュー</span>
+          <div class="font-preview-text" id="font-preview">abcdefghi<br>jklmnopqr<br>stuvwxyz</div>
+        </div>
+      </div>
     </div>
-
 
     <button class="btn-primary" onclick="switchScreen('home-screen')">保存してホームに戻る</button>
   </div>
@@ -537,7 +572,7 @@
       <div class="form-group">
         <label>単語帳の選択</label>
         <select id="book-select" onchange="onBookChange('solo')">
-          <option value="target1900">英単語ターゲット1900（6訂版）</option>
+          <option value="target1900">英単語ターゲット1900</option>
           <option value="basic300">システム英単語（5訂版）</option>
           <option value="leap">LEAP 改訂版</option>
           <option value="stock4500">英単語Stock4500</option>
@@ -603,7 +638,7 @@
         <div class="form-group">
           <label>単語帳の選択</label>
           <select id="multi-book-select" onchange="onBookChange('multi'); broadcastSettings();">
-            <option value="target1900">英単語ターゲット1900（6訂版）</option>
+            <option value="target1900">英単語ターゲット1900</option>
             <option value="basic300">システム英単語（5訂版）</option>
             <option value="leap">LEAP 改訂版</option>
             <option value="stock4500">英単語Stock4500</option>
@@ -728,7 +763,7 @@
   </button>
   <button class="nav-item" onclick="switchScreen('sound-settings-screen')">
     <span class="nav-icon" id="icon-settings"></span>
-    <span>音量設定</span>
+    <span>設定</span>
   </button>
 </nav>
 
@@ -745,6 +780,23 @@ function applyCustomIcons() {
   if (customIcons.mistakes) document.getElementById('icon-mistakes').innerHTML = `<img src="${customIcons.mistakes}" alt="間違えた単語">`;
   if (customIcons.vocab) document.getElementById('icon-vocab').innerHTML = `<img src="${customIcons.vocab}" alt="使った単語帳">`;
   if (customIcons.settings) document.getElementById('icon-settings').innerHTML = `<img src="${customIcons.settings}" alt="音量設定">`;
+}
+
+// フォント切り替え機能 ＆ サンプルプレビュー反映
+function changeEnglishFont(fontValue) {
+  document.documentElement.style.setProperty('--english-font', fontValue);
+  localStorage.setItem('typing_english_font', fontValue);
+  const fontSelect = document.getElementById('font-select');
+  if (fontSelect && fontSelect.value !== fontValue) {
+    fontSelect.value = fontValue;
+  }
+}
+
+function loadSavedFont() {
+  const savedFont = localStorage.getItem('typing_english_font');
+  if (savedFont) {
+    changeEnglishFont(savedFont);
+  }
 }
 
 let audioCtx = null;
@@ -828,8 +880,8 @@ const vocabBooks = {
     name: "英単語ターゲット1900 (6訂版)",
     maxId: 1900,
     raw: [
-       [1,"create","を創り出す"],[2,"increase","増加する"],[3,"improve","を向上させる"],[4,"mean","を意味する"],[5,"own","を所有している"],
-  [6,"include","を含む"],[7,"consider","を見なす"],[8,"allow","を許す"],[9,"suggest","を提案する"],[10,"produce","を生産する"],
+       [1,"create","を創り出す"],[2,"increase","増加する"],[3,"improve","を向上させる"],[4,"mean","を意味する"],[5,"own","所有している"],
+[6,"include","を含む"],[7,"consider","を見なす"],[8,"allow","を許す"],[9,"suggest","を提案する"],[10,"produce","を生産する"],
   [11,"decide","を決める"],[12,"offer","を提供する"],[13,"require","を要求する"],[14,"share","を共有する"],[15,"store","を保存する"],
   [16,"tend","傾向がある"],[17,"concern","心配している"],[18,"describe","について述べる"],[19,"involve","に関与させる"],[20,"reduce","を減らす"],
   [21,"design","を設計する"],[22,"force","を強いる"],[23,"limit","を制限する"],[24,"bear","に耐える"],[25,"affect","に影響を及ぼす"],
@@ -6845,7 +6897,7 @@ const vocabBooks = {
 [1290, "clarify", "明確にする"], 
 [1291, "coincidence", "偶然の一致"], 
 [1292, "specific", "特定の，具体的な"], 
-[1293, "one-hundred-percent", "100パーセント"], 
+[1293, "one-hundred-percent", "1"], 
 [1294, "must", "必須のもの，～しなければならない"], 
 [1295, "inconvenience", "不便"], 
 [1296, "busy", "忙しい，賑やかな，(電話が)話し中で"], 
@@ -9477,6 +9529,7 @@ function getMyPeerId() {
 
 window.onload = function() {
   applyCustomIcons();
+  loadSavedFont();
   const r = new URLSearchParams(window.location.search).get('room');
   if (r) {
     document.getElementById('room-id-input').value = r;
@@ -9843,7 +9896,6 @@ function updateScoreBoard() {
     } else if (hostConnection && hostConnection.open) {
       hostConnection.send({ type: 'PLAYER_FINISH_Q', score: correctCount });
       document.getElementById('msg-overlay').style.display = 'block';
-      document.getElementById('msg-title').innerText = "回答完了！";
       document.getElementById('msg-sub').innerText = "他のプレイヤーの回答を待っています...";
     }
     renderMultiScoreBoard();
